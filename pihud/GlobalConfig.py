@@ -16,6 +16,7 @@ class GlobalConfig():
         self.data = OrderedDict([
             ("debug",          False    ),
             ("port",           None     ),
+            ("baud",           None     ),
             ("page_adv_pin",   18       ),
             ("color",          "#53B9E8"),
             ("redline_color",  "#FF3643"),
