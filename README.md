@@ -17,7 +17,7 @@ After loging in, you will be presented with a terminal. Please install the follo
 ```shell
 sudo apt-get install python-qt4
 sudo apt-get install python-pip
-git clone https://github.com/brendan-w/piHud.git pihud
+git clone https://github.com/jackslegion/piHud.git pihud
 cd pihud/
 sudo python setup.py install
 ```
@@ -55,7 +55,7 @@ sudo shutdown -r 0
 Configuring
 -----------
 
-PiHud is configured by modifying a file named `pihud.rc` in your home directory. This file will be created the first time piHud runs. However, a few settings are accessable through the piHud app itself. To move widgets, simply click and drag them around the screen. Right clicking on widgets will tell you which sensor they are tied to, and allow you to delete them. Right clicking on the black background (not on a widget), will let you add widgets or pages to your HUD. By default, page switching can be done with the `TAB` key.
+PiHud is configured by modifying a file named `pihud.rc` in your home directory. This file will be created the first time piHud runs. However, a few settings are accessible through the piHud app itself. To move widgets, simply click and drag them around the screen. Right clicking on widgets will tell you which sensor they are tied to, and allow you to delete them. Right clicking on the black background (not on a widget), will let you add widgets or pages to your HUD. By default, page switching can be done with the `TAB` key.
 
 All other settings are available in the pihud.rc file, which is structured in `json`. A few items of note in this file:
 
