@@ -27,12 +27,12 @@ class Gauge(QWidget):
 
         s = scale(config["min"], config["max"], config["scale_step"])
 
-        self.angles = map_scale(s, 0, 270)
+        self.angles = map_scale(s, 0, 180)
         self.str_scale, self.multiplier = str_scale(s, config["scale_mult"])
 
-        self.red_angle = 270
+        self.red_angle = 180
         if config["redline"] is not None:
-            self.red_angle  = map_value(config["redline"], config["min"], config["max"], 0, 270)
+            self.red_angle  = map_value(config["redline"], config["min"], config["max"], 0, 180)
 
 
     def render(self, response):
@@ -51,7 +51,8 @@ class Gauge(QWidget):
         self.__text_r   = r - (r/10)   # radius of the text
         self.__tick_r   = r - (r/4)    # outer radius of the tick marks
         self.__tick_l   = (r/10)       # length of each tick, extending inwards
-        self.__needle_l = (r/5) * 3    # length of the needle
+        self.__needle_r = (r/5) * 3    # outer radius of the needle
+        self.__needle_l = (r/5)        # length of the needle, extending inwards
 
         painter = QPainter()
         painter.begin(self)
@@ -84,7 +85,7 @@ class Gauge(QWidget):
 
         for a in self.angles:
             painter.save()
-            painter.rotate(90 + 45 + a)
+            painter.rotate(90 + 90 + a)
 
             if a > self.red_angle:
                 painter.setPen(self.red_pen)
@@ -100,14 +101,14 @@ class Gauge(QWidget):
         r = QRect(p, p, d, d)
 
         # arc angles are in 16th of degrees
-        s = -(90 + 45) * 16
+        s = -(90 + 90) * 16
         l = -self.red_angle * 16
         painter.drawArc(r, s, l)
 
         painter.setPen(self.red_pen)
 
         s += l
-        l = -(270 - self.red_angle) * 16
+        l = -(180 - self.red_angle) * 16
         painter.drawArc(r, s, l)
 
 
@@ -125,9 +126,9 @@ class Gauge(QWidget):
             painter.translate(self.width() / 2, self.height() / 2)
 
             painter.rotate(a)
-            painter.rotate(-45)
+            painter.rotate(-90)
             painter.translate(-self.__text_r, 0)
-            painter.rotate(45)
+            painter.rotate(90)
             painter.rotate(-a)
 
             r_width  = self.config["font_size"] * len(v)
@@ -143,20 +144,20 @@ class Gauge(QWidget):
         painter.save()
 
         painter.translate(self.width() / 2, self.height() / 2)
-        angle = map_value(self.value, self.config["min"], self.config["max"], 0, 270)
-        angle = min(angle, 270)
-        angle -= 90 + 45
+        angle = map_value(self.value, self.config["min"], self.config["max"], 0, 180)
+        angle = min(angle, 180)
+        angle -= 90 + 90
         painter.rotate(angle)
 
 
-        painter.drawEllipse(QPoint(0,0), 5, 5)
+#        painter.drawEllipse(QPoint(0,0), 5, 5)
 
         painter.drawPolygon(
             QPolygon([
-                QPoint(-5, 0),
-                QPoint(0,   -self.__needle_l),
-                QPoint(5,  0),
-                QPoint(-5, 0)
+                QPoint(-5,  -self.__needle_l),
+                QPoint(0,   -self.__needle_r),
+                QPoint(5,   -self.__needle_l),
+                QPoint(-5,  -self.__needle_l)
             ])
         )
 
