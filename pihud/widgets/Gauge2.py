@@ -182,4 +182,4 @@ class Gauge(QWidget):
             r = QRect(0, -self.width() / 6, self.width(), self.height())
             painter.drawText(r, Qt.AlignHCenter | Qt.AlignVCenter, s)
 
-painter.restore()
+            painter.restore()
