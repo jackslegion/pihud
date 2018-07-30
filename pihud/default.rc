@@ -27,7 +27,7 @@
             }, 
             {
                 "sensor": "SPEED", 
-                "type": "Gauge", 
+                "type": "Text", 
                 "title": "MPH", 
                 "x": 500, 
                 "y": 93, 
