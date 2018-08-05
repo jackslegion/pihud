@@ -47,12 +47,12 @@ class Gauge(QWidget):
 
     def paintEvent(self, e):
 
-        r = min(self.width(), self.height()) / 2
-        self.__text_r   = r - (r/10)   # radius of the text
-        self.__tick_r   = r - (r/4)    # outer radius of the tick marks
-        self.__tick_l   = (r/10)       # length of each tick, extending inwards
-        self.__needle_r = (r/5) * 3    # outer radius of the needle
-        self.__needle_l = (r/5)        # length of the needle, extending inwards
+        r = min(self.width(), self.height())
+        self.__text_r   = (r / 4) * 3  # radius of the text, inside the gauge arc
+        self.__tick_r   = r            # outer radius of the tick marks and arc
+        self.__tick_l   = (r / 20)     # length of each tick, extending inwards
+        self.__needle_r = (r / 10) * 9 # outer radius of the needle
+        self.__needle_l = (r / 5)      # length of the needle, extending inwards
 
         painter = QPainter()
         painter.begin(self)
@@ -90,7 +90,7 @@ class Gauge(QWidget):
             if a > self.red_angle:
                 painter.setPen(self.red_pen)
 
-            painter.drawLine(self.__tick_r, 0, end, 0)
+            painter.drawLine(self.__tick_r - 5, 0, end, 0)  #5 px gap between arc and end of tick
             painter.restore()
 
 
@@ -126,9 +126,9 @@ class Gauge(QWidget):
             painter.translate(self.width() / 2, self.height() / 2)
 
             painter.rotate(a)
-            painter.rotate(-90)
+            painter.rotate(0)                       #sets gauge start angle, 0 is straight left
             painter.translate(-self.__text_r, 0)
-            painter.rotate(90)
+            painter.rotate(0)                       #sets numeral rotation, based on previous rotation
             painter.rotate(-a)
 
             r_width  = self.config["font_size"] * len(v)
@@ -146,7 +146,7 @@ class Gauge(QWidget):
         painter.translate(self.width() / 2, self.height() / 2)
         angle = map_value(self.value, self.config["min"], self.config["max"], 0, 180)
         angle = min(angle, 180)
-        angle -= 90 + 90
+        angle -= 90 + 0
         painter.rotate(angle)
 
 
@@ -154,10 +154,11 @@ class Gauge(QWidget):
 
         painter.drawPolygon(
             QPolygon([
-                QPoint(-5,  -self.__needle_l),
-                QPoint(0,   -self.__needle_r),
-                QPoint(5,   -self.__needle_l),
-                QPoint(-5,  -self.__needle_l)
+                QPoint(-5,  -self.__needle_l),      #start point, 5 px off left flank
+                QPoint(0,   -self.__needle_r),      #tip of needle
+                QPoint(5,   -self.__needle_l),      #5 px off right flank
+                Qpoint(0,   -self.__needle_l + 5)   #tail point of needle, 5 px off back
+                QPoint(-5,  -self.__needle_l)       #return to start point
             ])
         )
 

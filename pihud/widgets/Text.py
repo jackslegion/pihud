@@ -57,12 +57,13 @@ class Text(QWidget):
 
         h = 0
 
+        r = QRect(-self.width() / 2, -self.t_height / 2, self.width(), self.t_height)
+        painter.drawText(r, Qt.AlignVCenter, str(int(round(self.value))))
+
         if len(self.config["title"]) > 0:
-            h += self.t_height
-            r = QRect(0, 0, self.width(), self.t_height)
+            h += self.t_height / 2
+            r = QRect(-self.width() / 2, h, self.width(), self.t_height)
             painter.drawText(r, Qt.AlignVCenter, self.config["title"])
 
-        r = QRect(0, h, self.width(), self.t_height)
-        painter.drawText(r, Qt.AlignVCenter, str(int(round(self.value))))
 
         painter.end()
