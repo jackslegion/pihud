@@ -5,9 +5,9 @@ from PyQt4.QtGui import *
 from pihud.util import scale, map_scale, map_value, scale_offsets, str_scale
 
 
-class Gauge(QWidget):
+class Gauge2(QWidget):
     def __init__(self, parent, config):
-        super(Gauge, self).__init__(parent)
+        super(Gauge2, self).__init__(parent)
 
         self.config = config
         self.value = config["min"]
@@ -22,13 +22,15 @@ class Gauge(QWidget):
 
         self.font.setPixelSize(self.config["font_size"])
         self.note_font.setPixelSize(self.config["note_font_size"])
-        self.pen.setWidth(3)
-        self.red_pen.setWidth(3)
+        self.pen.setWidth(4)
+        self.red_pen.setWidth(4)
 
         s = scale(config["min"], config["max"], config["scale_step"])
+        ss = scale(config["min"] + config["scale_step"], config["max"] - config["scale_step"], config["scale_step"])
 
         self.angles = map_scale(s, 0, 180)
         self.str_scale, self.multiplier = str_scale(s, config["scale_mult"])
+        self.sub_angles = map_scale(ss, 22.5, 157.5)
 
         self.red_angle = 180
         if config["redline"] is not None:
@@ -47,12 +49,13 @@ class Gauge(QWidget):
 
     def paintEvent(self, e):
 
-        r = min(self.width(), self.height())
-        self.__text_r   = (r / 4) * 3  # radius of the text, inside the gauge arc
-        self.__tick_r   = r            # outer radius of the tick marks and arc
-        self.__tick_l   = (r / 20)     # length of each tick, extending inwards
-        self.__needle_r = (r / 10) * 9 # outer radius of the needle
-        self.__needle_l = (r / 5)      # length of the needle, extending inwards
+        r = min(self.width() / 2, self.height() / 2) #remember: radius is half of the config width
+        self.__text_r     = (r / 4) * 3   # radius of the text, inside the gauge arc
+        self.__tick_r     = r - 5         # outer radius of the tick marks and arc, 5 px offset from edges
+        self.__tick_l     = (r / 10)      # length of each tick, extending inwards
+        self.__sub_tick_l = (r / 15)      # sub tick length, extending inwards
+        self.__needle_r   = (r / 20) * 17 # outer radius of the needle
+        self.__needle_l   = (r / 5) * 3   # length of the needle, extending inwards
 
         painter = QPainter()
         painter.begin(self)
@@ -90,8 +93,23 @@ class Gauge(QWidget):
             if a > self.red_angle:
                 painter.setPen(self.red_pen)
 
-            painter.drawLine(self.__tick_r - 5, 0, end, 0)  #5 px gap between arc and end of tick
+            painter.drawLine(self.__tick_r - 15, 0, end, 0)  #10 px gap between arc and end of tick
             painter.restore()
+
+        # draw the sub ticks
+
+        end = self.__tick_r - self.__sub_tick_l
+
+        for a in self.sub_angles:
+            painter.save()
+            painter.rotate(90 + 90 + a)
+
+            if a > self.red_angle:
+                painter.setPen(self.red_pen)
+
+            painter.drawLine(self.__tick_r - 15, 0, end, 0)  #10 px gap between arc and end of tick
+            painter.restore()
+
 
 
         # draw the arc
@@ -154,11 +172,11 @@ class Gauge(QWidget):
 
         painter.drawPolygon(
             QPolygon([
-                QPoint(-5,  -self.__needle_l),      #start point, 5 px off left flank
-                QPoint(0,   -self.__needle_r),      #tip of needle
-                QPoint(5,   -self.__needle_l),      #5 px off right flank
-                Qpoint(0,   -self.__needle_l + 5)   #tail point of needle, 5 px off back
-                QPoint(-5,  -self.__needle_l)       #return to start point
+                QPoint(-5,  -self.__needle_l - 5),   #start point, 5 px off left flank
+                QPoint(0,   -self.__needle_r),       #tip of needle
+                QPoint(5,   -self.__needle_l - 5),   #5 px off right flank
+                QPoint(0,   -self.__needle_l),       #tail point of needle,
+                QPoint(-5,  -self.__needle_l - 5)    #return to start point
             ])
         )
 
